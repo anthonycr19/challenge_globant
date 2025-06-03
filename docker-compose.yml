@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: strong_password_123
+      POSTGRES_DB: app_database
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+
+    ports:
+      - "8000:8000"
+    environment:
+      DB_USER: app_user
+      DB_PASSWORD: strong_password_123
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: app_database
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+volumes:
+  postgres_data:
+
+networks:
+  mynetwork:
+    driver: bridge

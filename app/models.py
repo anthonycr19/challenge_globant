@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, BigInteger, DateTime
+from sqlalchemy import Column, String, ForeignKey, BigInteger, DateTime
 #from .database import Base
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 Base = declarative_base()
 
 
@@ -41,7 +44,14 @@ class HiredEmployee(Base):
     department = relationship("Department", back_populates="employees")
 
 
-# Para esta siguiente variable se pondrá el usuario, contraseña, hostname, puerto y nombre de la B.D.
-SQLACHEMY_DATABASE_URL = 'postgresql://postgres:admin123@localhost:5432/db_csv_file'
+# Obtener las credenciales
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
+db_name = os.getenv("DB_NAME")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+
+SQLACHEMY_DATABASE_URL = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port }/{db_name}"
+
 engine = create_engine(SQLACHEMY_DATABASE_URL)
 Base.metadata.create_all(bind=engine)
